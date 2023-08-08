@@ -1,0 +1,265 @@
+# This is the OpenAPI specification for your service. It is used to generate the client code.
+# To generate the server code, use the Gradle task `openApiGenerate`. The 
+# generated code will be placed in `build/generate-resources/main`.
+#
+# We will evaluate you based on how well you design your API.
+# 1. How well it follows REST principles.
+# 2. How easy it is to understand and use.
+#
+# References
+# 1. https://swagger.io/specification/
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: User Service
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8080
+security:
+  - BearerAuth: []
+
+paths:
+  /:
+    get:
+      summary: Default.
+      operationId: Default
+      responses:
+        '200':
+          description: Test return
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultResponse"
+  /hello:
+    get:
+      summary: This is just a test endpoint to get you started. Please delete this endpoint.
+      operationId: hello
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Test return
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/HelloResponse"
+        '404':
+          description: Not foundx
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /user/register:
+    post:
+      summary: Register a new user
+      operationId: UserRegister
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegisterRequest"
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRegisterResponse"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /login:
+    post:
+      summary: Login
+      operationId: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        '200':
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /user/profile:
+    get:
+      summary: Get My Profile
+      operationId: GetMyProfile
+      security: # Menambahkan security definition untuk endpoint ini
+        - BearerAuth: [ ]        # Menggunakan security scheme "BearerAuth"
+      responses:
+        '200':
+          description: User found successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /user:
+    put:
+      summary: Update My Profile
+      operationId: UpdateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        '200':
+          description: Update Profile successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer Token Authentication
+  schemas:
+    DefaultResponse:
+      type: object
+      required:
+        - version
+        - author
+      properties:
+        version:
+          type: string
+        author:
+          type: string
+    HelloResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    UserRegisterRequest:
+      type: object
+      required:
+        - phone_number
+        - full_name
+        - password
+      properties:
+        phone_number:
+          type: string
+          minLength: 10
+          maxLength: 13
+        full_name:
+          type: string
+          minLength: 3
+          maxLength: 60
+        password:
+          type: string
+          minLength: 6
+          maxLength: 64
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).+$"
+    LoginRequest:
+      type: object
+      required:
+        - phone_number
+        - password
+      properties:
+        phone_number:
+          type: string
+          minLength: 10
+          maxLength: 13
+        password:
+          type: string
+          minLength: 6
+          maxLength: 64
+    LoginResponse:
+      type: object
+      required:
+        - id
+        - message
+        - access_token
+        - expires_in
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+        access_token:
+          type: string
+        expires_in:
+            type: integer
+            format: int64
+    UserRegisterResponse:
+      type: object
+      required:
+        - message
+        - id
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    ProfileResponse:
+      type: object
+      required:
+        - id
+        - full_name
+        - phone_number
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        phone_number:
+          type: string
+    UpdateProfileRequest:
+      type: object
+      required:
+        - phone_number
+        - full_name
+      properties:
+        phone_number:
+          type: string
+          minLength: 10
+          maxLength: 13
+        full_name:
+          type: string
+          minLength: 3
+          maxLength: 60
